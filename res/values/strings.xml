@@ -1,0 +1,52 @@
+<resources>
+
+    <string name="app_name">RoboPlexxClient</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="hello">Hello World, AuthTest!</string>
+    <string name="robot_settings">Robot Settings</string>
+    <string name="robot_settings_reset">Reset Robot Settings</string>
+    <string name="connect_to_roboplexx">Connect Robot to RoboPlexx</string>
+    <string name="connect_to_local_network">Connect Robot to Local Network</string>
+    
+    <string name="init_conn_info">Connection: No info available</string>
+    <string name="init_status_info">Status: No info available</string>
+    <string name="init_emotion_info">Emotion: Normal</string>
+
+    <string name="title_activity_main">RoboPlexx</string>
+    <string name="title_activity_preferences">Roboplexx Preferences</string>
+    
+    <string name="roboplexx_prefs">RoboplexxPrefs</string>
+    <string name="pref_key_robot_name">robot_name</string>
+    <string name="pref_title_robot_name">Robot Name</string>
+    <string name="pref_summary_robot_name">The name for this device\'s robot.</string>
+    <string name="pref_default_robot_name">My Robot</string>
+    <string name="pref_key_local_network_port">robot_local_network</string>
+    <string name="pref_title_local_network_port">Webserver port</string>
+    <string name="pref_summary_local_network_port">The port to host this device/robot on when connecting to the local network.</string>
+    <string name="pref_key_roboplexx_accountname">robot_roboplexx_accountname</string>
+    <string name="pref_title_roboplexx_accountname">Roboplexx account</string>
+    <string name="pref_summary_roboplexx_accountname">The account to associate this device/robot with when connecting to Roboplexx.</string>
+    <string name="pref_key_roboplexx_publicrobot">roboplexx_publicrobot</string>
+    <string name="pref_title_roboplexx_publicrobot">Roboplexx public</string>
+    <string name="pref_summary_roboplexx_publicrobot">Anyone can control from Roboplexx website</string>
+
+    <string name="pref_key_roboplexx_service_running">roboplexx_service_running</string>
+    <string name="pref_title_roboplexx_service_running">Roboplexx enabled</string>
+    <string name="pref_summary_roboplexx_service_running">roboplexx_service_running</string>
+    
+    <string name="pref_key_roboplexx_robot_id">roboplexx_robot_id</string>
+    
+    <string name="upload_camera_image">Upload latest image</string>
+    
+    <string name="control_mode_disabled">Disconnected</string>
+    <string name="control_mode_lan">Connect using LAN (Local Area Network)</string>
+    <string name="control_mode_roboplexx_com">Connect using roboplexx.com</string>
+    
+    <string-array name="control_mode_options">
+        <item>@string/control_mode_disabled</item>
+        <item>@string/control_mode_lan</item>
+        <item>@string/control_mode_roboplexx_com</item>
+    </string-array>
+        
+</resources>

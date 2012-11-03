@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+<!--     <CheckBox -->
+<!--         android:id="@+id/checkbox_connect_to_roboplexx" -->
+<!--         android:layout_width="fill_parent" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:text="@string/connect_to_roboplexx" /> -->
+
+<!--     <CheckBox -->
+<!--         android:id="@+id/checkbox_connect_to_local_network" -->
+<!--         android:layout_width="fill_parent" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:text="@string/connect_to_local_network" /> -->
+
+    <Spinner
+        android:id="@+id/spinner_control_mode"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button_robot_settings"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/robot_settings" />
+
+    <Button
+        android:id="@+id/button_robot_settings_reset"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/robot_settings_reset" />
+
+    <Button
+        android:id="@+id/upload_camera_image"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/upload_camera_image" />
+
+    <TextView
+        android:id="@+id/label_roboplexx_status"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="RoboPlexx Status:" />
+
+    <TextView
+        android:id="@+id/text_roboplexx_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/label_robot_speeds"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Robot Speeds:" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/text_robot_speed_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:text="---" />
+
+        <TextView
+            android:id="@+id/text_robot_speed_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:text="---" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/emotion_info"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/init_emotion_info"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/conn_info"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/init_conn_info"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/status_info"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/init_status_info"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

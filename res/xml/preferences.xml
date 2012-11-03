@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="@string/pref_key_robot_name"
+        android:title="@string/pref_title_robot_name"
+        android:summary="@string/pref_summary_robot_name"
+        android:defaultValue="@string/pref_default_robot_name" />
+    <ListPreference
+        android:key="@string/pref_key_roboplexx_accountname"
+        android:title="@string/pref_title_roboplexx_accountname"
+        android:dialogTitle="@string/pref_title_roboplexx_accountname"
+        android:summary="@string/pref_summary_roboplexx_accountname"
+        />
+    <CheckBoxPreference 
+        android:key="@string/pref_key_roboplexx_publicrobot"
+        android:title="@string/pref_title_roboplexx_publicrobot"
+        android:summary="@string/pref_summary_roboplexx_publicrobot"/>
+    <EditTextPreference
+        android:key="@string/pref_key_local_network_port"
+        android:title="@string/pref_title_local_network_port"
+        android:summary="@string/pref_summary_local_network_port"
+        android:defaultValue="8080" />
+</PreferenceScreen>
