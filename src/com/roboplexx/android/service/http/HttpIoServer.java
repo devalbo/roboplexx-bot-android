@@ -1,16 +1,20 @@
 /**
  * 
  */
-package com.roboplexx.android.http;
+package com.roboplexx.android.service.http;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import android.app.Service;
 import android.content.res.AssetManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import com.roboplexx.android.romo.RomoUtil;
+import com.roboplexx.android.service.RoboplexxService;
 import com.romotive.library.RomoCommandInterface;
 
 /**
@@ -22,23 +26,28 @@ public class HttpIoServer extends NanoHTTPD {
 	private String _activeConfiguration = "Stopped";
 	private String _activeEmotion = "Unknown";
 	private RomoCommandInterface _commandInterface;
-	private HttpIoService _romoHttpIoService;
+	private RoboplexxService _roboplexxService;
 	private AssetManager _assetManager = null;
 	
 	private double _leftMotorSpeedPercent = 0.0;
 	private double _rightMotorSpeedPercent = 0.0;
 	private int _leftMotorSpeed = 0x80;
 	private int _rightMotorSpeed = 0x80;
+  private int _portNumber;
 
-	public HttpIoServer(int port, HttpIoService romoHttpActivity) throws IOException 
+	public HttpIoServer(int port, RoboplexxService roboplexxService) throws IOException 
 			{
 		super(port, null);
-    setStatus("HTTP IO server running");
-		_commandInterface = new RomoCommandInterface();
-		_romoHttpIoService = romoHttpActivity;
-		_assetManager = _romoHttpIoService.getAssets();
-			}
+    _roboplexxService = roboplexxService;
+    _portNumber = port;
 
+    setStatus("HTTP IO server running");
+    setConnectionInfo();
+		
+    _commandInterface = new RomoCommandInterface();
+		_assetManager = _roboplexxService.getAssets();
+			}
+	
 	@Override
 	public Response serve(String uri, String method, Properties header, 
 			Properties parms, Properties files) 
@@ -58,7 +67,8 @@ public class HttpIoServer extends NanoHTTPD {
 				}
 				_leftMotorSpeed = RomoUtil.convertSpeedPercentToCommand(_leftMotorSpeedPercent);
 				_rightMotorSpeed = RomoUtil.convertSpeedPercentToCommand(_rightMotorSpeedPercent);
-				setStatus("Motor commands: " + getMotorCommands());
+//				setStatus("Motor commands: " + getMotorCommands());
+				updateMotorSpeeds(_leftMotorSpeedPercent, _rightMotorSpeedPercent);
 				
 				_commandInterface.playMotorCommand(_leftMotorSpeed, _rightMotorSpeed);
 			}
@@ -67,30 +77,6 @@ public class HttpIoServer extends NanoHTTPD {
 
 			
 		} else if (uri.equalsIgnoreCase("/devices/camera/image")) {
-			//			int cameraId = findFrontFacingCamera();
-			//			Camera camera = Camera.open(cameraId);
-			//			if (cameraId < 0) {
-			////				Toast.makeText(_romoHttpActivity, "No front facing camera found.",
-			////						Toast.LENGTH_LONG).show();
-			//			}
-			//			
-			//			try {
-			//	      camera.setPreviewDisplay(myCamSHolder);
-			//      } catch (IOException e) {
-			//	      // TODO Auto-generated catch block
-			//	      e.printStackTrace();
-			//      }
-			//			camera.takePicture(null, null, new PhotoHandler());
-			//			
-			//		} else if (uri.equalsIgnoreCase("/devices/right-motor")) {
-			//			StringBuilder sb = new StringBuilder();
-			//			for (Object key : parms.keySet()) {
-			//				sb.append(key.toString());
-			//				sb.append(":");
-			//				sb.append(parms.get(key));
-			//				sb.append("\n");
-			//			}
-			//			responseText = sb.toString();
 
 		} else if (uri.equalsIgnoreCase("/devices/left-motor")) {
 
@@ -216,38 +202,39 @@ public class HttpIoServer extends NanoHTTPD {
 
 		}
 	}
+	
+  public String setConnectionInfo() {
+    WifiManager wifiManager = (WifiManager) _roboplexxService.getSystemService(Service.WIFI_SERVICE);
+    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+    int ip = wifiInfo.getIpAddress();
 
-//	private int findFrontFacingCamera() {
-//		int cameraId = -1;
-//		// Search for the front facing camera
-//		int numberOfCameras = Camera.getNumberOfCameras();
-//		for (int i = 0; i < numberOfCameras; i++) {
-//			CameraInfo info = new CameraInfo();
-//			Camera.getCameraInfo(i, info);
-//			if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-//				Log.d("Finding front facing camera", "Camera found");
-//				cameraId = i;
-//				break;
-//			}
-//		}
-//		return cameraId;
-//	}
+    String ipString = String.format(
+      "Connection: %d.%d.%d.%d:%d",
+      (ip & 0xff),
+      (ip >> 8 & 0xff),
+      (ip >> 16 & 0xff),
+      (ip >> 24 & 0xff),
+      _portNumber );
+
+    _roboplexxService.setConnectionInfo(ipString);
+    return ipString;
+  }
 
 	private void setStatus(String statusText) {
 		_activeConfiguration = statusText;
-		_romoHttpIoService.setStatusText(statusText);
+		_roboplexxService.setStatusText(statusText);
+	}
+	
+	private void updateMotorSpeeds(double leftMotorSpeed, double rightMotorSpeed) {
+    _roboplexxService.updateRobotSpeeds(leftMotorSpeed, rightMotorSpeed);
 	}
 
 	private void setEmotion(String emotion) {
-		_romoHttpIoService.setEmotion(emotion);
+		_roboplexxService.setEmotion(emotion);
 	}
 	
 	private String getMotorSpeeds() {
 		return "L: " + _leftMotorSpeedPercent + "%  <<->>  R: " + _rightMotorSpeedPercent + " %";
-	}
-	
-	private String getMotorCommands() {
-		return "L: " + _leftMotorSpeed + " <<->>  R: " + _rightMotorSpeed;
 	}
 
 }

@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' >
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.css">
+    <!-- <script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>  -->
+    <!-- <script type="text/javascript" src="/static/js/bootstrap.js"></script>  -->
+    <title>Manywhere for Romo</title>
+  </head>
+
+  <body>
+	<div class="navbar">
+	  <div class="navbar-inner">
+		<div class="container">
+		  <ul class="nav">
+			<a class="brand" href="#">
+			  Manywhere for Romo
+			</a>
+			<li><a href=".">Romo Control</a></li>
+			<li><a href=".">Configurations</a></li>
+			<li><a href=".">Devices</a></li>
+		  </ul>
+		</div>
+	  </div>
+
+    <div class="container">
+	<h1>Movement</h1>
+    <div class="row">
+	  <div class="span1 offset1">
+	  <form name="veer-left" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="veer-left"/>
+			<input type="submit" value="Veer left" />
+			</form>
+		</div>
+	  <div class="span1">
+			<form name="straight-ahead" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="forward"/>
+			<input type="submit" value="Forward" />
+			</form>
+</div>
+	  <div class="span1">
+			<form name="veer-right" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="veer-right"/>
+			<input type="submit" value="Veer right" />
+			</form>
+</div>
+	</div>
+
+    <div class="row">
+	  <div class="span1 offset1">
+			<form name="spin-left" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="spin-left"/>
+			<input type="submit" value="Spin left" />
+			</form>
+		</div>
+	  <div class="span1">
+			<form name="stop" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="stop"/>
+			<input type="submit" value="Stop!" />
+			</form>
+</div>
+	  <div class="span1">
+			<form name="spin-right" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="spin-right"/>
+			<input type="submit" value="Spin right" />
+			</form>
+</div>
+	</div>
+
+    <div class="row">
+	  <div class="span1 offset1">
+			<form name="back-left" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="back-left"/>
+			<input type="submit" value="Back left" />
+			</form>
+		</div>
+	  <div class="span1">
+			<form name="reverse" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="reverse"/>
+			<input type="submit" value="Reverse" />
+			</form>
+</div>
+	  <div class="span1">
+			<form name="back-right" action="/configurations/direction" method="post">
+			<input type="hidden" name="value" value="back-right"/>
+			<input type="submit" value="Back right" />
+			</form>
+</div>
+	</div>
+
+
+    <div class="container">
+    	<h1>Emotion</h1>
+		<table border="1">
+			<tr>
+			
+			<td>
+			<form action="/devices/emotionator" method="post">
+			<input type="hidden" name="value" value="happy"/>
+			<input type="submit" value="Show happy" />
+			</form>
+			</td>
+			
+			<td>
+			<form action="/devices/emotionator" method="post">
+			<input type="hidden" name="value" value="sad"/>
+			<input type="submit" value="Show sad" />
+			</form>
+			</td>
+			
+			<td>
+			<form action="/devices/emotionator" method="post">
+			<input type="hidden" name="value" value="meh"/>
+			<input type="submit" value="Show meh" />
+			</form>
+			</td>
+
+			</tr>
+
+			<tr>
+
+			<td>
+			<form action="/devices/emotionator" method="post">
+			<input type="hidden" name="value" value="love"/>
+			<input type="submit" value="Show love" />
+			</form>
+			</td>
+			
+			<td>
+			<form action="/devices/emotionator" method="post">
+			<input type="hidden" name="value" value="angry"/>
+			<input type="submit" value="Show angry" />
+			</form>
+			</td>
+			
+			<td>
+			<form action="/devices/emotionator" method="post">
+			<input type="hidden" name="value" value="silly"/>
+			<input type="submit" value="Show silly" />
+			</form>
+			</td>
+
+			</tr>
+			
+		</table>
+    </div>
+    
+  </body>
+</html>

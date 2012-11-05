@@ -1,4 +1,4 @@
-package com.roboplexx.android.appengine.channel;
+package com.roboplexx.android.service.appengine;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,14 +29,14 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.roboplexx.android.appengine.AppEngineServiceThread;
+import com.roboplexx.android.service.appengine.AppEngineServer;
 
 public class ChannelAPI {
 
   private enum ReadyState {CONNECTING, OPEN, CLOSING, CLOSED};
 
   //    private String BASE_URL = "https://hub.roboplexx.com"; //Defaults to LocalHost
-  private String BASE_URL = AppEngineServiceThread.ROBOPLEXX_ROOT_URL;
+  private String BASE_URL = AppEngineServer.ROBOPLEXX_ROOT_URL;
   private String listenUrl = null;
   private final String CHANNEL_URL = "/_ah/channel/";
   private final String PROD_TALK_URL = "https://talkgadget.google.com/talkgadget/";
@@ -147,7 +147,7 @@ public class ChannelAPI {
   public void open() throws IOException, ChannelException {
     this.readyState = ReadyState.CONNECTING;
     //    	if(this.BASE_URL.contains("localhost")){ //Local Development Mode
-    if (AppEngineServiceThread.usingDevServer()) {
+    if (AppEngineServer.usingDevServer()) {
       connect(sendGet(getUrl("connect"))); 
     } else { //Production - AppEngine Mode
       initialize();

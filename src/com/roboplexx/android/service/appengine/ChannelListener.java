@@ -1,4 +1,4 @@
-package com.roboplexx.android.appengine.channel;
+package com.roboplexx.android.service.appengine;
 
 public class ChannelListener implements ChannelService {
   /**

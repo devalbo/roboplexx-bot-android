@@ -1,4 +1,4 @@
-package com.roboplexx.android.http;
+package com.roboplexx.android.service.http;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

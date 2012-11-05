@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.roboplexx.android.appengine;
+package com.roboplexx.android.service.appengine;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -28,6 +28,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -39,17 +40,14 @@ import android.widget.Toast;
 
 import com.roboplexx.android.R;
 import com.roboplexx.android.RoboplexxCommand;
-import com.roboplexx.android.R.string;
-import com.roboplexx.android.appengine.channel.ChannelAPI;
-import com.roboplexx.android.appengine.channel.ChannelService;
-import com.roboplexx.android.appengine.channel.XHR;
+import com.roboplexx.android.service.RoboplexxService;
 import com.romotive.library.RomoCommandInterface;
 
 /**
  * @author ajb
  *
  */
-public class AppEngineServiceThread extends Thread {
+public class AppEngineServer extends Thread {
 
   public enum ServiceState {
     INITIALIZING,
@@ -86,10 +84,10 @@ public class AppEngineServiceThread extends Thread {
   private String mRoboplexxRobotSubscribeUrl;
   private long mLastAppliedCommandMs;
 
-  private AppEngineService mRoboplexxService;
+  private RoboplexxService mRoboplexxService;
 
-  public AppEngineServiceThread(AppEngineService service) {
-    mRoboplexxService = service;
+  public AppEngineServer(RoboplexxService roboplexxService) {
+    mRoboplexxService = roboplexxService;
     setStatus(ServiceState.INITIALIZING);
   }
 
@@ -98,9 +96,10 @@ public class AppEngineServiceThread extends Thread {
     try {
 
       setStatus(ServiceState.INITIALIZING_ROMO);
+      
       // Initialize the RomoCommandInterface
       mCommandInterface = new RomoCommandInterface();
-      AudioManager manager = (AudioManager) mRoboplexxService.getSystemService(AppEngineService.AUDIO_SERVICE);
+      AudioManager manager = (AudioManager) mRoboplexxService.getSystemService(Service.AUDIO_SERVICE);
       manager.setStreamVolume(AudioManager.STREAM_MUSIC, manager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
       setStatus(ServiceState.INITIALIZING_ACCOUNT);

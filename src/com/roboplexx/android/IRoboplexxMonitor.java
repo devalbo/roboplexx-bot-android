@@ -15,4 +15,6 @@ public interface IRoboplexxMonitor {
 
   public void updateEmotion(String emotion);
 
+  public void setConnectionInfo(String ipString);
+
 }
