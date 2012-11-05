@@ -11,8 +11,6 @@ public interface IRoboplexxService {
 
   void setRoboplexxMonitor(IRoboplexxMonitor iRoboplexxMonitor);
 
-  String getStatusMessage();
-  
-  int getControlModeIndex();
+  CharSequence getStatusMessage();
 
 }
