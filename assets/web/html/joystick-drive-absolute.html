@@ -90,8 +90,9 @@
 			function sendUpdatedSpeeds() {
 				var speedLeft = joystick.getLeftSpeedPercentCommand(),
 					speedRight = joystick.getRightSpeedPercentCommand();
-				if (speedLeft != lastSentSpeedLeft ||
-					speedRight != lastSentSpeedRight)
+				if ((speedLeft != lastSentSpeedLeft ||
+					speedRight != lastSentSpeedRight) &&
+					(speedLeft != null && speedRight != null))
 				{
 					$.post("motors", { left_speed: speedLeft, right_speed: speedRight } );
 					lastSentSpeedLeft = speedLeft;

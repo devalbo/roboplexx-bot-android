@@ -33,12 +33,6 @@
         android:layout_height="wrap_content"
         android:text="@string/robot_settings_reset" />
 
-    <Button
-        android:id="@+id/upload_camera_image"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/upload_camera_image" />
-
     <TextView
         android:id="@+id/label_roboplexx_status"
         android:layout_width="fill_parent"
@@ -77,26 +71,17 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/emotion_info"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/init_emotion_info"
-        android:textSize="35sp"
-        android:textStyle="bold" />
-
-    <TextView
         android:id="@+id/conn_info"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/init_conn_info"
-        android:textSize="35sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/status_info"
+        android:id="@+id/emotion_info"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/init_status_info"
+        android:text="@string/init_emotion_info"
         android:textSize="35sp"
         android:textStyle="bold" />
 

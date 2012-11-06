@@ -28,11 +28,9 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -41,7 +39,6 @@ import android.widget.Toast;
 import com.roboplexx.android.R;
 import com.roboplexx.android.RoboplexxCommand;
 import com.roboplexx.android.service.RoboplexxService;
-import com.romotive.library.RomoCommandInterface;
 
 /**
  * @author ajb
@@ -75,8 +72,6 @@ public class AppEngineServer extends Thread {
 
   private HttpClient mHttpClient;
   private Handler mServiceThreadHandler = new Handler();
-  private RomoCommandInterface mCommandInterface;
-  private ServiceState mStatus;
   private String mStatusMessage;
   private String mAuthToken;
   private ChannelAPI mChannelApi;
@@ -94,13 +89,6 @@ public class AppEngineServer extends Thread {
   @Override
   public void run() {
     try {
-
-      setStatus(ServiceState.INITIALIZING_ROMO);
-      
-      // Initialize the RomoCommandInterface
-      mCommandInterface = new RomoCommandInterface();
-      AudioManager manager = (AudioManager) mRoboplexxService.getSystemService(Service.AUDIO_SERVICE);
-      manager.setStreamVolume(AudioManager.STREAM_MUSIC, manager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
       setStatus(ServiceState.INITIALIZING_ACCOUNT);
       Account roboplexxAccount = getActiveAccount();
@@ -159,9 +147,7 @@ public class AppEngineServer extends Thread {
             RoboplexxCommand roboplexxCommand = new RoboplexxCommand(message);
 
             if (roboplexxCommand.lastSentMs > mLastAppliedCommandMs) {
-              System.out.println("Motor speeds: " + roboplexxCommand.speedLeft + ", " + roboplexxCommand.speedRight);
-              mRoboplexxService.updateRobotSpeeds(roboplexxCommand.speedLeft, roboplexxCommand.speedRight);
-              mCommandInterface.playMotorCommand(roboplexxCommand.speedLeftCommand, roboplexxCommand.speedRightCommand);
+              mRoboplexxService.setRobotMotorSpeeds(roboplexxCommand.speedLeft, roboplexxCommand.speedRight);
               mLastAppliedCommandMs = roboplexxCommand.lastSentMs;
             }
 
@@ -202,7 +188,7 @@ public class AppEngineServer extends Thread {
     if (mStatusMessage != null) {
       return mStatusMessage;
     }
-    return mStatus.toString();
+    return "???";
   }
 
   private String getKey(int resourceId) {
@@ -349,7 +335,6 @@ public class AppEngineServer extends Thread {
   }
 
   private void setStatus(ServiceState status) {
-    mStatus = status;
     mRoboplexxService.setStatus(status.toString());
   }
 
@@ -361,29 +346,18 @@ public class AppEngineServer extends Thread {
   public void terminate() {
     try {
 
-      stopMovement();
+      mRoboplexxService.setRobotMotorSpeeds(0.0, 0.0);
 
       if (mChannelApi != null) {
         mChannelApi.close();
       }
       
-      if (mCommandInterface != null) {
-//        mCommandInterface.shutdown();
-      }
-
     } catch (Exception e) {
       e.printStackTrace();
       setStatus(ServiceState.FAILED, e.getLocalizedMessage());
 
     } finally {
       mChannelApi = null;
-      mCommandInterface = null;
-    }
-  }
-
-  private void stopMovement() {
-    if (mCommandInterface != null) {
-      mCommandInterface.playMotorCommand(128, 128);
     }
   }
 

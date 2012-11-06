@@ -88,14 +88,14 @@ public class RoboplexxMain extends Activity {
     unbindService(mRoboplexxServiceConnection);
   }
 
-  public void setStatusText(final String statusText) {
-    mHandler.post(new Runnable() {
-      public void run() {
-        TextView statusInfo = (TextView)findViewById(R.id.status_info);
-        statusInfo.setText("Status: " + statusText);
-      }
-    });
-  }
+//  public void setStatusText(final String statusText) {
+//    mHandler.post(new Runnable() {
+//      public void run() {
+//        TextView statusInfo = (TextView)findViewById(R.id.status_info);
+//        statusInfo.setText("Status: " + statusText);
+//      }
+//    });
+//  }
 
   public void setEmotion(final String emotion) {
     mHandler.post(new Runnable() {
@@ -197,7 +197,7 @@ public class RoboplexxMain extends Activity {
       mHandler.post(new Runnable() {
 
         public void run() {
-          setStatusText(mRoboplexxService.getStatusMessage());
+//          setStatusText(mRoboplexxService.getStatusMessage());
 
           spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 

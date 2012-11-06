@@ -13,9 +13,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.roboplexx.android.romo.RomoUtil;
 import com.roboplexx.android.service.RoboplexxService;
-import com.romotive.library.RomoCommandInterface;
 
 /**
  * @author ajb
@@ -25,14 +23,9 @@ public class HttpIoServer extends NanoHTTPD {
 
 	private String _activeConfiguration = "Stopped";
 	private String _activeEmotion = "Unknown";
-	private RomoCommandInterface _commandInterface;
 	private RoboplexxService _roboplexxService;
 	private AssetManager _assetManager = null;
 	
-	private double _leftMotorSpeedPercent = 0.0;
-	private double _rightMotorSpeedPercent = 0.0;
-	private int _leftMotorSpeed = 0x80;
-	private int _rightMotorSpeed = 0x80;
   private int _portNumber;
 
 	public HttpIoServer(int port, RoboplexxService roboplexxService) throws IOException 
@@ -42,9 +35,8 @@ public class HttpIoServer extends NanoHTTPD {
     _portNumber = port;
 
     setStatus("HTTP IO server running");
-    setConnectionInfo();
+    updateConnectionInfo();
 		
-    _commandInterface = new RomoCommandInterface();
 		_assetManager = _roboplexxService.getAssets();
 			}
 	
@@ -55,25 +47,24 @@ public class HttpIoServer extends NanoHTTPD {
 
 		if (uri.equalsIgnoreCase("/motors")) {
 			if (method.equalsIgnoreCase("post")) {
+			  double leftMotorSpeedPercent = _roboplexxService.getRobotLeftMotorSpeed();
+			  double rightMotorSpeedPercent = _roboplexxService.getRobotRightMotorSpeed();
+			  
 				try {
-					_leftMotorSpeedPercent = Double.parseDouble((String) parms.get("left_speed"));
+				  leftMotorSpeedPercent = Double.parseDouble((String) parms.get("left_speed"));
 				} catch (NumberFormatException e) {
 					setStatus("Invalid left motor speed: " + (String) parms.get("left_speed"));
 				}
 				try {
-					_rightMotorSpeedPercent = Double.parseDouble((String) parms.get("right_speed"));
+					rightMotorSpeedPercent = Double.parseDouble((String) parms.get("right_speed"));
 				} catch (NumberFormatException e) {
 					setStatus("Invalid right motor speed: " + (String) parms.get("right_speed"));
 				}
-				_leftMotorSpeed = RomoUtil.convertSpeedPercentToCommand(_leftMotorSpeedPercent);
-				_rightMotorSpeed = RomoUtil.convertSpeedPercentToCommand(_rightMotorSpeedPercent);
-//				setStatus("Motor commands: " + getMotorCommands());
-				updateMotorSpeeds(_leftMotorSpeedPercent, _rightMotorSpeedPercent);
-				
-				_commandInterface.playMotorCommand(_leftMotorSpeed, _rightMotorSpeed);
+
+				setRobotMotorSpeeds(leftMotorSpeedPercent, rightMotorSpeedPercent);
 			}
 				
-			return new Response(HTTP_OK, "text/plain", getMotorSpeeds());
+			return new Response(HTTP_OK, "text/plain", _roboplexxService.getMotorReport());
 
 			
 		} else if (uri.equalsIgnoreCase("/devices/camera/image")) {
@@ -166,44 +157,44 @@ public class HttpIoServer extends NanoHTTPD {
 
 		if (newConfig.equalsIgnoreCase("veer-left")) {
 			setStatus("Veering left");
-			_commandInterface.playMotorCommand(0xC0, 0xFF);
+			setRobotMotorSpeeds(75.0, 100.0);
 
 		} else if (newConfig.equalsIgnoreCase("forward")) {
 			setStatus("Going forward");
-			_commandInterface.playMotorCommand(0xFF, 0xFF);
+			setRobotMotorSpeeds(100.0, 100.0);
 
 		} else if (newConfig.equalsIgnoreCase("veer-right")) {
 			setStatus("Veering right");
-			_commandInterface.playMotorCommand(0xFF, 0xC0);
+			setRobotMotorSpeeds(100.0, 75.0);
 
 		} else if (newConfig.equalsIgnoreCase("spin-left")) {
 			setStatus("Spinning left");
-			_commandInterface.playMotorCommand(0x00, 0xFF);
+			setRobotMotorSpeeds(0.0, 100.0);
 
 		} else if (newConfig.equalsIgnoreCase("stop")) {
 			setStatus("Stopped");
-			_commandInterface.playMotorCommand(0x80, 0x80);
+			setRobotMotorSpeeds(0.0, 0.0);
 
 		} else if (newConfig.equalsIgnoreCase("spin-right")) {
 			setStatus("Spinning right");
-			_commandInterface.playMotorCommand(0xFF, 0x00);
+			setRobotMotorSpeeds(100.0, 0.0);
 
 		} else if (newConfig.equalsIgnoreCase("back-left")) {
 			setStatus("Backing left");
-			_commandInterface.playMotorCommand(0x40, 0x00);
+			setRobotMotorSpeeds(-75.0, 0.0);
 
 		} else if (newConfig.equalsIgnoreCase("reverse")) {
 			setStatus("In reverse");
-			_commandInterface.playMotorCommand(0x00, 0x00);
+			setRobotMotorSpeeds(-100.0, -100.0);
 
 		} else if (newConfig.equalsIgnoreCase("back-right")) {
 			setStatus("Backing right");
-			_commandInterface.playMotorCommand(0x00, 0x40);
+			setRobotMotorSpeeds(0.0, -75.0);
 
 		}
 	}
 	
-  public String setConnectionInfo() {
+  public String updateConnectionInfo() {
     WifiManager wifiManager = (WifiManager) _roboplexxService.getSystemService(Service.WIFI_SERVICE);
     WifiInfo wifiInfo = wifiManager.getConnectionInfo();
     int ip = wifiInfo.getIpAddress();
@@ -225,16 +216,12 @@ public class HttpIoServer extends NanoHTTPD {
 		_roboplexxService.setStatusText(statusText);
 	}
 	
-	private void updateMotorSpeeds(double leftMotorSpeed, double rightMotorSpeed) {
-    _roboplexxService.updateRobotSpeeds(leftMotorSpeed, rightMotorSpeed);
+	private void setRobotMotorSpeeds(double leftMotorSpeed, double rightMotorSpeed) {
+    _roboplexxService.setRobotMotorSpeeds(leftMotorSpeed, rightMotorSpeed);
 	}
 
 	private void setEmotion(String emotion) {
 		_roboplexxService.setEmotion(emotion);
 	}
 	
-	private String getMotorSpeeds() {
-		return "L: " + _leftMotorSpeedPercent + "%  <<->>  R: " + _rightMotorSpeedPercent + " %";
-	}
-
 }
