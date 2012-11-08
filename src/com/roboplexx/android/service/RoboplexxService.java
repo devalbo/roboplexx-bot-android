@@ -40,7 +40,7 @@ public class RoboplexxService extends Service implements IRoboplexxService {
   private Notification mNotification;
 
   private String mConnectionString = "";
-  private String mLastStatus = "Not started";
+  private String mLastStatus = "Disconnected";
   private String mLastEmotion = "Normal";
   private double _leftMotorSpeedPercent = 0.0;
   private double _rightMotorSpeedPercent = 0.0;
