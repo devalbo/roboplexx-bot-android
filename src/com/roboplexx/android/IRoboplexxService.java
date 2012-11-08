@@ -14,5 +14,13 @@ public interface IRoboplexxService {
   String getStatusMessage();
   
   int getControlModeIndex();
+  
+  double getRobotLeftMotorSpeed();
+  
+  double getRobotRightMotorSpeed();
+  
+  String getEmotion();
+  
+  String getConnectionInfo();
 
 }

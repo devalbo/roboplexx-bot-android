@@ -88,24 +88,6 @@ public class RoboplexxMain extends Activity {
     unbindService(mRoboplexxServiceConnection);
   }
 
-//  public void setStatusText(final String statusText) {
-//    mHandler.post(new Runnable() {
-//      public void run() {
-//        TextView statusInfo = (TextView)findViewById(R.id.status_info);
-//        statusInfo.setText("Status: " + statusText);
-//      }
-//    });
-//  }
-
-  public void setEmotion(final String emotion) {
-    mHandler.post(new Runnable() {
-      public void run() {
-        TextView statusInfo = (TextView)findViewById(R.id.emotion_info);
-        statusInfo.setText("Emotion: " + emotion);
-      }
-    });   
-  }
-
   public void startRoboplexxServer() {
     Toast.makeText(RoboplexxMain.this, "Controlling via roboplexx.com", Toast.LENGTH_SHORT).show();
     Intent intent = new Intent(RoboplexxMain.this, RoboplexxService.class);
@@ -125,6 +107,20 @@ public class RoboplexxMain extends Activity {
     Intent intent = new Intent(RoboplexxMain.this, RoboplexxService.class);
     intent.putExtra("command", RoboplexxServiceCommand.STOP_SERVING.toString());
     startService(intent);
+  }
+  
+  public void refreshFieldsFromService() {
+    final TextView statusText = (TextView)findViewById(R.id.text_roboplexx_status);
+    final TextView leftSpeedText = (TextView)findViewById(R.id.text_robot_speed_left);
+    final TextView rightSpeedText = (TextView)findViewById(R.id.text_robot_speed_right);
+    final TextView emotionText = (TextView)findViewById(R.id.emotion_info);
+    final TextView connectionText = (TextView)findViewById(R.id.conn_info);
+
+    statusText.setText(mRoboplexxService.getStatusMessage());
+    leftSpeedText.setText(String.format("%.2f", mRoboplexxService.getRobotLeftMotorSpeed()));
+    rightSpeedText.setText(String.format("%.2f", mRoboplexxService.getRobotRightMotorSpeed()));
+    emotionText.setText("Emotion: " + mRoboplexxService.getEmotion());
+    connectionText.setText(mRoboplexxService.getConnectionInfo());
   }
 
   /** Defines callbacks for service binding, passed to bindService() */
@@ -172,7 +168,7 @@ public class RoboplexxMain extends Activity {
           mHandler.post(new Runnable() {
 
             public void run() {
-              emotionText.setText(emotion);
+              emotionText.setText("Emotion: " + emotion);
             }
 
           });
@@ -197,7 +193,6 @@ public class RoboplexxMain extends Activity {
       mHandler.post(new Runnable() {
 
         public void run() {
-//          setStatusText(mRoboplexxService.getStatusMessage());
 
           spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -235,10 +230,19 @@ public class RoboplexxMain extends Activity {
           });
         }
       });
+      
+      mHandler.post(new Runnable() {
+
+        @Override
+        public void run() {
+          refreshFieldsFromService();          
+        }
+      });
     }
 
     public void onServiceDisconnected(ComponentName arg0) {
       mRoboplexxService.setRoboplexxMonitor(null);
+      mRoboplexxService = null;
     }
   };
 

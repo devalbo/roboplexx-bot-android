@@ -213,7 +213,7 @@ public class HttpIoServer extends NanoHTTPD {
 
 	private void setStatus(String statusText) {
 		_activeConfiguration = statusText;
-		_roboplexxService.setStatusText(statusText);
+		_roboplexxService.setStatus(statusText);
 	}
 	
 	private void setRobotMotorSpeeds(double leftMotorSpeed, double rightMotorSpeed) {

@@ -28,9 +28,12 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -59,8 +62,6 @@ public class AppEngineServer extends Thread {
     FAILED
   };
 
-  //  public final static String ROBOPLEXX_ROOT_URL = "http://192.168.0.151:8080";
-  //  public final static String ROBOPLEXX_ROOT_URL = "http://10.10.10.104:8080";
   public final static String ROBOPLEXX_ROOT_URL = "https://roboplexx.appspot.com";
 
   //  public final static String ROBOPLEX_ROBOT_INFO_PREFS_ID = "roboplexx_robot_info";
@@ -72,7 +73,6 @@ public class AppEngineServer extends Thread {
 
   private HttpClient mHttpClient;
   private Handler mServiceThreadHandler = new Handler();
-  private String mStatusMessage;
   private String mAuthToken;
   private ChannelAPI mChannelApi;
   private String mRoboplexxId;
@@ -170,6 +170,7 @@ public class AppEngineServer extends Thread {
       });
 
       mChannelApi.open();
+      updateConnectionInfo();
 
     } catch (Exception e) {
       final String message = e.getClass().getName() + ": " + e.getLocalizedMessage();
@@ -182,13 +183,6 @@ public class AppEngineServer extends Thread {
       });
 
     }
-  }
-
-  public String getStatus() {
-    if (mStatusMessage != null) {
-      return mStatusMessage;
-    }
-    return "???";
   }
 
   private String getKey(int resourceId) {
@@ -340,7 +334,12 @@ public class AppEngineServer extends Thread {
 
   private void setStatus(ServiceState status, String statusMessage) {
     setStatus(status);
-    mStatusMessage = statusMessage;
+  }
+  
+  public String updateConnectionInfo() {
+    String roboplexxUrl = "http://www.roboplexx.com/robots";
+    mRoboplexxService.setConnectionInfo(roboplexxUrl);
+    return roboplexxUrl;
   }
 
   public void terminate() {

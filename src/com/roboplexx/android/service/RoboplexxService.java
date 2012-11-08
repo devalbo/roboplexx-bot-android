@@ -2,14 +2,21 @@ package com.roboplexx.android.service;
 
 import java.io.IOException;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.IBinder;
+import android.widget.RemoteViews;
 
 import com.roboplexx.android.IRoboplexxMonitor;
 import com.roboplexx.android.IRoboplexxService;
+import com.roboplexx.android.R;
 import com.roboplexx.android.RoboplexxBinder;
+import com.roboplexx.android.RoboplexxMain;
 import com.roboplexx.android.romo.RomoUtil;
 import com.roboplexx.android.service.appengine.AppEngineServer;
 import com.roboplexx.android.service.http.HttpIoServer;
@@ -30,7 +37,11 @@ public class RoboplexxService extends Service implements IRoboplexxService {
   private HttpIoServer mHttpIoServer = null;
   private IRoboplexxMonitor mRoboplexxMonitor = null;
   private RomoCommandInterface mCommandInterface = null;
-  
+  private Notification mNotification;
+
+  private String mConnectionString = "";
+  private String mLastStatus = "Not started";
+  private String mLastEmotion = "Normal";
   private double _leftMotorSpeedPercent = 0.0;
   private double _rightMotorSpeedPercent = 0.0;
 
@@ -50,6 +61,7 @@ public class RoboplexxService extends Service implements IRoboplexxService {
     switch (command) {
     case CONNECT_TO_ROBOPLEXX:
       clearConnectionInfo();
+      initRoboplexxNotification();
       initRomoInterface();
       mRoboplexxThread = new AppEngineServer(this);
       mRoboplexxThread.start();
@@ -59,6 +71,7 @@ public class RoboplexxService extends Service implements IRoboplexxService {
     case START_HTTP_SERVER:
       try {
         clearConnectionInfo();
+        initRoboplexxNotification();
         initRomoInterface();
         setStatus("Starting HTTP IO server");
         mHttpIoServer = new HttpIoServer(_portNumber, this);
@@ -73,13 +86,16 @@ public class RoboplexxService extends Service implements IRoboplexxService {
     case STOP_SERVING:
       try {
         clearConnectionInfo();
-        shutdownRomoInterface();
+        cancelRoboplexxNotification();
         if (mRoboplexxThread != null) {
           mRoboplexxThread.terminate();
         }
         if (mHttpIoServer != null) {
           mHttpIoServer.stop();
         }
+        shutdownRomoInterface();
+        setStatus("Disconnected");
+        
       } catch (Exception e) {
         e.printStackTrace();
         setStatus("Error shutting down: " + e.getLocalizedMessage());
@@ -109,7 +125,7 @@ public class RoboplexxService extends Service implements IRoboplexxService {
 
   private void initRomoInterface() {
     if (mCommandInterface == null) {
-      setStatusText("Initializing Romo audio");
+      setStatus("Initializing Romo audio");
       mCommandInterface = new RomoCommandInterface();
       AudioManager manager = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
       manager.setStreamVolume(AudioManager.STREAM_MUSIC, manager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
@@ -123,6 +139,44 @@ public class RoboplexxService extends Service implements IRoboplexxService {
     }
   }
   
+  private void initRoboplexxNotification() {
+    final NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+
+    int notificationIcon = R.drawable.notification;
+    if (mNotification == null) {
+      mNotification = new Notification();
+      startForeground(R.layout.status_bar_notification, mNotification);
+   }
+    Notification notif = mNotification;
+
+    // This is who should be launched if the user selects our notification.
+    notif.contentIntent = PendingIntent.getActivity(this, 0,
+        new Intent(this, RoboplexxMain.class), 0);
+
+    // the icon for the status bar
+    notif.icon = notificationIcon;
+
+    // our custom view
+    RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.status_bar_notification);
+    contentView.setImageViewResource(R.id.icon, notificationIcon);
+    notif.contentView = contentView;
+    notif.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+    
+    String notificationText = mConnectionString;
+    notif.setLatestEventInfo(getApplicationContext(), "Roboplexx Running", notificationText, notif.contentIntent);
+
+    // we use a string id because is a unique number.  we use it later to cancel the
+    // notification
+    notificationManager.notify(R.layout.status_bar_notification, notif);
+  }
+  
+  private void cancelRoboplexxNotification() {
+    final NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+    notificationManager.cancel(R.layout.status_bar_notification);
+    mNotification = null;
+    stopForeground(true);
+  }
+  
   public void stopMovement() {
     if (mCommandInterface != null) {
       mCommandInterface.playMotorCommand(128, 128);
@@ -130,10 +184,7 @@ public class RoboplexxService extends Service implements IRoboplexxService {
   }
 
   public String getStatusMessage() {
-    if (mRoboplexxThread != null) {
-      return mRoboplexxThread.getStatus();
-    }
-    return "Not started";
+    return mLastStatus;
   }
   
   public int getControlModeIndex() {
@@ -150,22 +201,18 @@ public class RoboplexxService extends Service implements IRoboplexxService {
     mRoboplexxMonitor = iRoboplexxListener;
   }
 
-  public void setStatus(String string) {
-    if (mRoboplexxMonitor != null) {
-      mRoboplexxMonitor.updateRoboplexxStatus(string);
-    }
-  }
-
-  public void setStatusText(String statusText) {
+  public void setStatus(String statusText) {
     if (mRoboplexxMonitor != null) {
       mRoboplexxMonitor.updateRoboplexxStatus(statusText);
     }
+    mLastStatus = statusText;
   }
 
   public void setEmotion(String emotion) {
     if (mRoboplexxMonitor != null) {
       mRoboplexxMonitor.updateEmotion(emotion);
     }
+    mLastEmotion = emotion;
   }
 
   public void setRobotMotorSpeeds(double left_speed, double right_speed) {
@@ -186,10 +233,21 @@ public class RoboplexxService extends Service implements IRoboplexxService {
   public double getRobotRightMotorSpeed() {
     return _rightMotorSpeedPercent;
   }
+  
+  public String getEmotion() {
+    return mLastEmotion;
+  }
+
+  public String getConnectionInfo() {
+    return mConnectionString;
+  }
+
 
   public void setConnectionInfo(String ipString) {
     if (mRoboplexxMonitor != null) {
-      mRoboplexxMonitor.setConnectionInfo(ipString);
+      mConnectionString = ipString;
+      mRoboplexxMonitor.setConnectionInfo(mConnectionString);
+      initRoboplexxNotification();
     }
   }
   
